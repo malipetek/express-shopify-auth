@@ -1,4 +1,4 @@
-import compose from 'koa-compose';
+import { compose } from 'compose-middleware';
 
 import {loginAgainIfDifferentShop} from './login-again-if-different-shop';
 import {verifyToken} from './verify-token';

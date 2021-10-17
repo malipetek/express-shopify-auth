@@ -1,7 +1,7 @@
-import {Context} from 'koa';
+import {Request} from 'express';
 
-export default function getCookieOptions(ctx: Context) {
-  const {header} = ctx;
+export default function getCookieOptions(req: Request) {
+  const {header} = req;
   const userAgent = header['user-agent'];
   const isChrome = userAgent && userAgent.match(/chrome|crios/i);
   let cookieOptions = {};

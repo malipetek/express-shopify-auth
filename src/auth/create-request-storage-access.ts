@@ -1,4 +1,4 @@
-import {Context} from 'koa';
+import {Request, Response} from 'express';
 
 import {OAuthStartOptions} from '../types';
 
@@ -18,16 +18,16 @@ const ACTION = 'Continue';
 export default function createRequestStorageAccess({
   prefix,
 }: OAuthStartOptions) {
-  return function requestStorage(ctx: Context) {
-    const {query} = ctx;
+  return function requestStorage(req: Request, res: Response) {
+    const {query} = req;
     const {shop} = query;
 
     if (shop == null) {
-      ctx.throw(400, Error.ShopParamMissing);
+      res.status(400).send(Error.ShopParamMissing);
       return;
     }
 
-    ctx.body = `
+    res.send`
 <!DOCTYPE html>
 <html lang="en">
 <head>

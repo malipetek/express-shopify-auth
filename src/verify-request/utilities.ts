@@ -1,4 +1,4 @@
-import {Context} from 'koa';
+import {Request, Response} from 'express';
 
 import Shopify from '@shopify/shopify-api';
 
@@ -8,21 +8,22 @@ import {DEFAULT_ACCESS_MODE} from '../auth';
 
 export function redirectToAuth(
   {fallbackRoute, authRoute}: Routes,
-  ctx: Context,
+  req: Request,
+  res: Response
 ) {
   const {
     query: {shop},
-  } = ctx;
+  } = req;
 
   const routeForRedirect =
     shop == null ? fallbackRoute : `${authRoute}?shop=${shop}`;
 
-  ctx.redirect(routeForRedirect);
+  res.redirect(routeForRedirect);
 }
 
-export async function clearSession(ctx: Context, accessMode: AccessMode = DEFAULT_ACCESS_MODE) {
+export async function clearSession(req: Request, res: Response, accessMode: AccessMode = DEFAULT_ACCESS_MODE) {
   try {
-    await Shopify.Utils.deleteCurrentSession(ctx.req, ctx.res, accessMode === 'online');
+    await Shopify.Utils.deleteCurrentSession(req, res, accessMode === 'online');
   }
   catch (error) {
     if (error instanceof Shopify.Errors.SessionNotFound) {
