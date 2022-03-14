@@ -12,7 +12,7 @@ export default function createTopLevelOAuthRedirect(
   const redirect = createTopLevelRedirect(apiKey, path);
 
   return function topLevelOAuthRedirect(req: Request, res: Response) {
-    res.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME, '1', getCookieOptions(req));
+    req.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME, '1', getCookieOptions(req));
     redirect(req, res);
   };
 }

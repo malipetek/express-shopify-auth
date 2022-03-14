@@ -21,7 +21,7 @@ export function verifyToken(
   returnHeader = false,
 ) {
   return async function verifyTokenMiddleware(
-    req: Request, 
+    req: Request,
     res: Response,
     next: NextFunction,
   ) {
@@ -48,11 +48,11 @@ export function verifyToken(
           );
           await client.get({path: 'shop'});
 
-          res.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME);
+          req.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME);
           return next();
-        } catch(e) {
-          if (e instanceof HttpResponseError && e.code == 401){
-              // only catch 401 errors
+        } catch (e) {
+          if (e instanceof HttpResponseError && e.code == 401) {
+            // only catch 401 errors
           } else {
             throw e;
           }
@@ -60,7 +60,7 @@ export function verifyToken(
       }
     }
 
-    res.cookies.set(TEST_COOKIE_NAME, '1');
+    req.cookies.set(TEST_COOKIE_NAME, '1');
 
     if (returnHeader) {
       res.status(403);
@@ -70,7 +70,7 @@ export function verifyToken(
       if (session) {
         shop = session.shop;
       } else if (Shopify.Context.IS_EMBEDDED_APP) {
-        const authHeader: string|undefined = req.headers.authorization;
+        const authHeader: string | undefined = req.headers.authorization;
         const matches = authHeader?.match(/Bearer (.*)/);
         if (matches) {
           const payload = Shopify.Utils.decodeSessionToken(matches[1]);

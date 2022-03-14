@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import {Request, Response} from 'express';
 
 import {OAuthStartOptions, AccessMode, NextFunction} from '../types';
 
@@ -55,7 +55,11 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
 
   setUserAgent();
 
-  return async function shopifyAuth(req: Request, res: Response, next: NextFunction) {
+  return async function shopifyAuth(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
     req.cookies.secure = true;
 
     if (
@@ -72,7 +76,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
     ) {
       const shop = req.query.shop as string;
       if (shop == null) {
-        req.status(400);
+        res.status(400);
       }
 
       req.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME, '', getCookieOptions(req));
@@ -103,7 +107,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
           hmac: req.query.hmac as string,
         };
 
-        req.locals.shopify = await Shopify.Auth.validateAuthCallback(
+        res.locals.shopify = await Shopify.Auth.validateAuthCallback(
           req,
           res,
           authQuery,
@@ -114,7 +118,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
         }
       } catch (e) {
         switch (true) {
-          case (e instanceof Shopify.Errors.InvalidOAuthError):
+          case e instanceof Shopify.Errors.InvalidOAuthError:
             res.status(400).send(e.message);
             break;
           case e instanceof Shopify.Errors.CookieNotFound:
