@@ -27,7 +27,8 @@ export default function createRequestStorageAccess({
       return;
     }
 
-    res.send`
+    res.set('Content-Type', 'text/html')
+    res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,6 +80,6 @@ export default function createRequestStorageAccess({
     </div>
   </main>
 </body>
-</html>`;
+</html>`);
   };
 }

@@ -3,11 +3,7 @@
 ![Build Status](https://github.com/Shopify/koa-shopify-auth/workflows/CI/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md) [![npm version](https://badge.fury.io/js/%40shopify%2Fkoa-shopify-auth.svg)](https://badge.fury.io/js/%40shopify%2Fkoa-shopify-auth)
 
-Middleware to authenticate a [Koa](http://koajs.com/) application with [Shopify](https://www.shopify.ca/).
-
-Sister module to [`@shopify/shopify-express`](https://www.npmjs.com/package/@shopify/shopify-express), but simplified.
-
-Features you might know from the express module like the webhook middleware and proxy will be presented as their [own packages instead](https://github.com/Shopify/quilt/blob/master/packages/koa-shopify-graphql-proxy/README.md).
+Middleware to authenticate a [Express]() application with [Shopify](https://www.shopify.ca/).
 
 ## Warning: versions prior to 3.1.68 vulnerable to reflected XSS
 
@@ -18,7 +14,7 @@ Versions prior to 3.1.68 are vulnerable to a reflected XSS attack. Please update
 This package builds upon the [Shopify Node Library](https://github.com/Shopify/shopify-node-api), so your app will have access to all of the library's features as well as the Koa-specific middlewares this package provides.
 
 ```bash
-$ yarn add @shopify/koa-shopify-auth
+$ yarn add @malipetek/express-shopify-auth
 ```
 
 ## Usage
@@ -47,8 +43,7 @@ Shopify.Context.initialize({
 Returns an authentication middleware taking up (by default) the routes `/auth` and `/auth/callback`.
 
 ```js
-app.use(
-  shopifyAuth({
+const authHandler = shopifyAuth({
     // if specified, mounts the routes off of the given path
     // eg. /shopify/auth, /shopify/auth/callback
     // defaults to ''
@@ -63,8 +58,14 @@ app.use(
 
       ctx.redirect('/');
     },
-  }),
-);
+  });
+  
+const autheHandlerWrapper = (req, res, next) => {
+  console.log('Authentication request received ', req.url);
+  return authHandler(req, res, next);
+}
+
+app.use(autheHandlerWrapper);
 ```
 
 #### `/auth`

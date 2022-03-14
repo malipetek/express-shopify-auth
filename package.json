@@ -1,6 +1,6 @@
 {
-  "name": "@shopify/koa-shopify-auth",
-  "version": "4.1.4",
+  "name": "@malipetek/express-shopify-auth",
+  "version": "4.1.47",
   "license": "MIT",
   "description": "Middleware to authenticate a Koa application with Shopify",
   "main": "dist/src/index.js",
@@ -26,24 +26,24 @@
   },
   "homepage": "https://github.com/Shopify/koa-shopify-auth/blob/master/README.md",
   "dependencies": {
-    "@shopify/network": "^1.5.0",
-    "@shopify/shopify-api": "^1.2.1",
+    "@shopify/network": "^1.6.4",
+    "@shopify/shopify-api": "^1.4.1",
     "compose-middleware": "^5.0.1",
     "express": "^4.17.1",
-    "koa-compose": ">=3.0.0 <4.0.0",
     "nonce": "^1.0.4",
     "tslib": "^1.9.3"
   },
+  "peerDependencies": {
+    "@shopify/shopify-api": "^1.4.1"
+  },
   "devDependencies": {
-    "@shopify/jest-dom-mocks": "^2.9.1",
-    "@shopify/jest-koa-mocks": "^2.2.3",
-    "@types/jest": "^26.0.20",
-    "@types/node": "^14.14",
+    "@shopify/jest-dom-mocks": "^2.11.7",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.11.1",
     "babel-preset-shopify": "^21.0.0",
-    "eslint": "^7.8.1",
-    "jest": "^26.4.2",
-    "node-fetch": "^2.6.0",
-    "typescript": "^4.0.2"
+    "eslint": "^7.32.0",
+    "jest": "^26.6.3",
+    "typescript": "^4.4.4"
   },
   "sideEffects": false,
   "files": [

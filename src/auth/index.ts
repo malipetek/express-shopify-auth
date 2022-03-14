@@ -62,8 +62,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
       !hasCookieAccess(req) &&
       !grantedStorageAccess(req)
     ) {
-      await requestStorageAccess(req, res);
-      return;
+      return await requestStorageAccess(req, res);
     }
 
     if (
@@ -113,7 +112,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
             res.redirect(`${oAuthStartPath}?shop=${req.query.shop}`);
             break;
           default:
-            res.throw(500, e.message);
+            res.status(500).send(e.message);
             break;
         }
       }

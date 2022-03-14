@@ -28,7 +28,8 @@ export default function createEnableCookies({
       return;
     }
 
-    res.send`
+    res.set('Content-Type', 'text/html')
+    res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +84,6 @@ export default function createEnableCookies({
     </div>
   </main>
 </body>
-</html>`;
+</html>`);
   };
 }
