@@ -8,14 +8,15 @@ import createTopLevelOAuthRedirect from './create-top-level-oauth-redirect';
 import createRequestStorageAccess from './create-request-storage-access';
 import setUserAgent from './set-user-agent';
 
-import Shopify from '@shopify/shopify-api';
+import Shopify, {AuthQuery} from '@shopify/shopify-api';
 
 const DEFAULT_MYSHOPIFY_DOMAIN = 'myshopify.com';
 export const DEFAULT_ACCESS_MODE: AccessMode = 'online';
 
 export const TOP_LEVEL_OAUTH_COOKIE_NAME = 'shopifyTopLevelOAuth';
 export const TEST_COOKIE_NAME = 'shopifyTestCookie';
-export const GRANTED_STORAGE_ACCESS_COOKIE_NAME = 'shopify.granted_storage_access';
+export const GRANTED_STORAGE_ACCESS_COOKIE_NAME =
+  'shopify.granted_storage_access';
 
 function hasCookieAccess({cookies}: Request) {
   return Boolean(cookies.TEST_COOKIE_NAME);
@@ -69,7 +70,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
       req.path === inlineOAuthPath ||
       (req.path === oAuthStartPath && shouldPerformInlineOAuth(req))
     ) {
-      const shop = req.query.shop;
+      const shop = req.query.shop as string;
       if (shop == null) {
         req.status(400);
       }
@@ -80,7 +81,7 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
         res,
         shop,
         oAuthCallbackPath,
-        config.accessMode === 'online'
+        config.accessMode === 'online',
       );
       res.redirect(redirectUrl);
       return;
@@ -93,21 +94,31 @@ export default function createShopifyAuth(options: OAuthStartOptions) {
 
     if (req.path === oAuthCallbackPath) {
       try {
-        await Shopify.Auth.validateAuthCallback(req, res, req.query);
+        const authQuery: AuthQuery = {
+          code: req.query.code as string,
+          shop: req.query.shop as string,
+          host: req.query.host as string,
+          state: req.query.state as string,
+          timestamp: req.query.timestamp as string,
+          hmac: req.query.hmac as string,
+        };
 
-        req.locals.shopify = await Shopify.Utils.loadCurrentSession(req, res, config.accessMode === 'online');
+        req.locals.shopify = await Shopify.Auth.validateAuthCallback(
+          req,
+          res,
+          authQuery,
+        );
 
         if (config.afterAuth) {
           await config.afterAuth(req, res);
         }
-      }
-      catch (e) {
+      } catch (e) {
         switch (true) {
           case (e instanceof Shopify.Errors.InvalidOAuthError):
             res.status(400).send(e.message);
             break;
-          case (e instanceof Shopify.Errors.CookieNotFound):
-          case (e instanceof Shopify.Errors.SessionNotFound):
+          case e instanceof Shopify.Errors.CookieNotFound:
+          case e instanceof Shopify.Errors.SessionNotFound:
             // This is likely because the OAuth session cookie expired before the merchant approved the request
             res.redirect(`${oAuthStartPath}?shop=${req.query.shop}`);
             break;

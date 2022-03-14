@@ -18,6 +18,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "importHelpers": true,
+    "allowJs": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -35,7 +36,8 @@
   "include": [
     "../../config/typescript/**/*",
     "./src/**/*.ts",
-    "./src/**/*.tsx"
+    "./src/**/*.tsx",
+    "./src/app-bridge-*.js"
   ],
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/test_helper.ts"]
 }

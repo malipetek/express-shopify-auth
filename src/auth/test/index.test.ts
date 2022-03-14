@@ -20,8 +20,9 @@ jest.mock('../create-top-level-oauth-redirect', () =>
 );
 
 const mockRequestStorageAccess = jest.fn();
-jest.mock('../create-request-storage-access', () => () =>
-  mockRequestStorageAccess,
+jest.mock(
+  '../create-request-storage-access',
+  () => () => mockRequestStorageAccess,
 );
 
 const mockEnableCookies = jest.fn();
@@ -37,12 +38,15 @@ const baseConfig: OAuthStartOptions = {
 function nextFunction() {}
 
 describe('Index', () => {
-  beforeEach(() => {
-    Shopify.Auth.beginAuth = jest.fn(() => Promise.resolve(`https://${shop}/auth/callback`));
+  const session = new Shopify.Session.Session('test_session');
+  session.shop = shop;
+  session.accessToken = 'test_token';
 
-    const session = new Shopify.Session.Session('test_session');
-    session.shop = shop;
-    session.accessToken = 'test_token';
+  beforeEach(() => {
+    Shopify.Auth.beginAuth = jest.fn(() =>
+      Promise.resolve(`https://${shop}/auth/callback`),
+    );
+
     Shopify.Utils.loadCurrentSession = jest.fn(() => Promise.resolve(session));
   });
 
@@ -150,7 +154,9 @@ describe('Index', () => {
     };
 
     beforeEach(() => {
-      Shopify.Auth.validateAuthCallback = jest.fn(() => Promise.resolve());
+      Shopify.Auth.validateAuthCallback = jest.fn(() =>
+        Promise.resolve(session),
+      );
     });
 
     it('performs oauth callback', async () => {
@@ -172,7 +178,10 @@ describe('Index', () => {
         throw: jest.fn(),
       });
 
-      const shopifyAuth = createShopifyAuth({...baseConfig, accessMode: 'offline'});
+      const shopifyAuth = createShopifyAuth({
+        ...baseConfig,
+        accessMode: 'offline',
+      });
       await shopifyAuth(ctx, nextFunction);
 
       expect(ctx.throw).not.toHaveBeenCalled();
@@ -199,7 +208,9 @@ describe('Index', () => {
     });
 
     it('throws a 400 if the OAuth callback is invalid', async () => {
-      Shopify.Auth.validateAuthCallback = jest.fn(() => Promise.reject(new Shopify.Errors.InvalidOAuthError));
+      Shopify.Auth.validateAuthCallback = jest.fn(() =>
+        Promise.reject(new Shopify.Errors.InvalidOAuthError()),
+      );
 
       const ctx = createMockContext({
         url: baseCallbackUrl,
@@ -213,7 +224,9 @@ describe('Index', () => {
     });
 
     it('retries if the session does not exist', async () => {
-      Shopify.Auth.validateAuthCallback = jest.fn(() => Promise.reject(new Shopify.Errors.SessionNotFound));
+      Shopify.Auth.validateAuthCallback = jest.fn(() =>
+        Promise.reject(new Shopify.Errors.SessionNotFound()),
+      );
 
       const ctx = createMockContext({
         url: `${baseCallbackUrl}?${querystring.stringify(queryData)}`,
@@ -227,7 +240,9 @@ describe('Index', () => {
     });
 
     it('retries if the cookie does not exist', async () => {
-      Shopify.Auth.validateAuthCallback = jest.fn(() => Promise.reject(new Shopify.Errors.CookieNotFound));
+      Shopify.Auth.validateAuthCallback = jest.fn(() =>
+        Promise.reject(new Shopify.Errors.CookieNotFound()),
+      );
 
       const ctx = createMockContext({
         url: `${baseCallbackUrl}?${querystring.stringify(queryData)}`,
@@ -241,7 +256,9 @@ describe('Index', () => {
     });
 
     it('throws a 500 on any other errors', async () => {
-      Shopify.Auth.validateAuthCallback = jest.fn(() => Promise.reject(new Shopify.Errors.ShopifyError));
+      Shopify.Auth.validateAuthCallback = jest.fn(() =>
+        Promise.reject(new Shopify.Errors.ShopifyError()),
+      );
 
       const ctx = createMockContext({
         url: `${baseCallbackUrl}?${querystring.stringify(queryData)}`,
@@ -253,7 +270,6 @@ describe('Index', () => {
 
       expect(ctx.throw).toHaveBeenCalledWith(500, '');
     });
-
   });
 
   describe('with the /auth/enable_cookies path', () => {

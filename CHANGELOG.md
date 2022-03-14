@@ -7,22 +7,48 @@ and adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [4.1.4] - 2021-07-19
+## [5.0.3] - 2022-02-24
+
 ### Fixed
+
+- Make sure the bundled package includes the App Bridge lib [150](https://github.com/Shopify/koa-shopify-auth/pull/150), fixes missing files from v5.0.0-5.0.2
+
+## [5.0.0] - 2022-02-24
+
+### Fixed
+
+- ⚠️ [breaking] Upgraded `@shopify/shopify-api` version [149](https://github.com/Shopify/koa-shopify-auth/pull/149)
+  - See the [library release notes](https://github.com/Shopify/shopify-node-api/blob/main/CHANGELOG.md#200---2021-10-28) for details on the breaking changes. By default, apps should only need to make changes to usages of `Shopify.Webhook` since other breaking changes are internally handled by this package.
+- Replace deprecated EASDK call with App Bridge [148](https://github.com/Shopify/koa-shopify-auth/pull/148)
+
+## [4.1.5] - 2022-02-15
+
+### Fixed
+
+- Replace deprecated metafields API request used for oauth token check with longer lived call to the shop endpoint [144](https://github.com/Shopify/koa-shopify-auth/pull/144)
+
+## [4.1.4] - 2021-07-19
+
+### Fixed
+
 - Retry OAuth if cookie / session has expired on callback [112](https://github.com/Shopify/koa-shopify-auth/pull/112)
 
 ## [4.1.3] - 2021-04-22
+
 ### Fixed
+
 - Fix authentication error if the Shopify session ended before its expiration date [94](https://github.com/Shopify/koa-shopify-auth/pull/94)
 
 ## [4.1.2] - 2021-03-30
 
 ### Fixed
+
 - Remove `samesite=none` setting from `cookie-options`. [83](https://github.com/Shopify/koa-shopify-auth/pull/83)
 
 ## [4.1.1] - 2021-03-26
 
 ### Added
+
 - Bumped `@shopify/shopify-api` version to v1.2.1 to include the new API version (`April21`). [80](https://github.com/Shopify/koa-shopify-auth/pull/80)
 
 ## [4.1.0] - 2021-03-23

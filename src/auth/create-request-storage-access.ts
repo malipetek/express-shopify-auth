@@ -1,9 +1,10 @@
 import {Request, Response} from 'express';
 
-import {OAuthStartOptions} from '../types';
-
 import Shopify from '@shopify/shopify-api';
+import fs from 'fs';
+import path from 'path';
 
+import {OAuthStartOptions} from '../types';
 import css from './client/polaris-css';
 import itpHelper from './client/itp-helper';
 import requestStorageAccess from './client/request-storage-access';
@@ -15,12 +16,17 @@ const BODY =
   'Your browser is blocking this app from accessing your data. To continue using this app, click Continue, then click Allow if the browser prompts you.';
 const ACTION = 'Continue';
 
+const APP_BRIDGE_SCRIPT = fs.readFileSync(
+  path.resolve(`${__dirname}/../app-bridge-2.0.12.js`),
+);
+
 export default function createRequestStorageAccess({
   prefix,
 }: OAuthStartOptions) {
   return function requestStorage(req: Request, res: Response) {
     const {query} = req;
-    const {shop} = query;
+    const shop = query.shop as string;
+    const host = query.host as string;
 
     if (shop == null) {
       res.status(400).send(Error.ShopParamMissing);
@@ -39,12 +45,14 @@ export default function createRequestStorageAccess({
   <base target="_top">
   <title>Redirecting…</title>
 
+  <script>${APP_BRIDGE_SCRIPT}</script>
   <script>
     window.apiKey = "${Shopify.Context.API_KEY}";
+    window.host = "${host}";
     window.shopOrigin = "https://${encodeURIComponent(shop)}";
     ${itpHelper}
     ${storageAccessHelper}
-    ${requestStorageAccess(shop, prefix)}
+    ${requestStorageAccess(shop, host, prefix)}
   </script>
 </head>
 <body>

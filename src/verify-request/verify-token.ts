@@ -1,5 +1,5 @@
 import Shopify from '@shopify/shopify-api';
-import { Session } from '@shopify/shopify-api/dist/auth/session';
+import {Session} from '@shopify/shopify-api/dist/auth/session';
 
 import {Request, Response} from 'express';
 
@@ -9,28 +9,44 @@ import {TEST_COOKIE_NAME, TOP_LEVEL_OAUTH_COOKIE_NAME} from '../index';
 import {Routes} from './types';
 import {redirectToAuth} from './utilities';
 import {DEFAULT_ACCESS_MODE} from '../auth';
-import { HttpResponseError } from '@shopify/shopify-api/dist/error';
+import {HttpResponseError} from '@shopify/shopify-api/dist/error';
 
 export const REAUTH_HEADER = 'X-Shopify-API-Request-Failure-Reauthorize';
-export const REAUTH_URL_HEADER = 'X-Shopify-API-Request-Failure-Reauthorize-Url';
+export const REAUTH_URL_HEADER =
+  'X-Shopify-API-Request-Failure-Reauthorize-Url';
 
-export function verifyToken(routes: Routes, accessMode: AccessMode = DEFAULT_ACCESS_MODE, returnHeader = false) {
+export function verifyToken(
+  routes: Routes,
+  accessMode: AccessMode = DEFAULT_ACCESS_MODE,
+  returnHeader = false,
+) {
   return async function verifyTokenMiddleware(
     req: Request, 
     res: Response,
     next: NextFunction,
   ) {
     let session: Session | undefined;
-    session = await Shopify.Utils.loadCurrentSession(req, res, accessMode === 'online');
+    session = await Shopify.Utils.loadCurrentSession(
+      req,
+      res,
+      accessMode === 'online',
+    );
 
     if (session) {
       const scopesChanged = !Shopify.Context.SCOPES.equals(session.scope);
 
-      if (!scopesChanged && session.accessToken && (!session.expires || session.expires >= new Date())) {
+      if (
+        !scopesChanged &&
+        session.accessToken &&
+        (!session.expires || session.expires >= new Date())
+      ) {
         try {
           // make a request to make sure oauth has succeeded, retry otherwise
-          const client = new Shopify.Clients.Rest(session.shop, session.accessToken)
-          await client.get({ path: "metafields", query: {'limit': 1} }) 
+          const client = new Shopify.Clients.Rest(
+            session.shop,
+            session.accessToken,
+          );
+          await client.get({path: 'shop'});
 
           res.cookies.set(TOP_LEVEL_OAUTH_COOKIE_NAME);
           return next();
@@ -38,7 +54,7 @@ export function verifyToken(routes: Routes, accessMode: AccessMode = DEFAULT_ACC
           if (e instanceof HttpResponseError && e.code == 401){
               // only catch 401 errors
           } else {
-            throw e
+            throw e;
           }
         }
       }
@@ -50,7 +66,7 @@ export function verifyToken(routes: Routes, accessMode: AccessMode = DEFAULT_ACC
       res.status(403);
       res.set(REAUTH_HEADER, '1');
 
-      let shop: string|undefined = undefined;
+      let shop: string | undefined = undefined;
       if (session) {
         shop = session.shop;
       } else if (Shopify.Context.IS_EMBEDDED_APP) {

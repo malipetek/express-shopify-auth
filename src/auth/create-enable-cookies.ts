@@ -16,12 +16,11 @@ const FOOTER = `Cookies let the app authenticate you by temporarily storing your
 information. They expire after 30 days.`;
 const ACTION = 'Enable cookies';
 
-export default function createEnableCookies({
-  prefix,
-}: OAuthStartOptions) {
+export default function createEnableCookies({prefix}: OAuthStartOptions) {
   return function enableCookies(req: Request, res: Response) {
     const {query} = req;
-    const {shop} = query;
+    const shop = query.shop as string;
+    const host = query.host as string;
 
     if (shop == null) {
       res.status(400).send(Error.ShopParamMissing);
@@ -42,10 +41,11 @@ export default function createEnableCookies({
 
   <script>
     window.apiKey = "${Shopify.Context.API_KEY}";
+    window.host = "${host}";
     window.shopOrigin = "https://${encodeURIComponent(shop)}";
 
     ${itpHelper}
-    ${topLevelInteraction(shop, prefix)}
+    ${topLevelInteraction(shop, host, prefix)}
   </script>
 </head>
 <body>
